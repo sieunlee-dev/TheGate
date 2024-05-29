@@ -38,8 +38,9 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		return;
 	}
 
-	float DetectRadius = AIPawn->GetAIDetectRange();
-
+	float DetectRadius = AIPawn->GetAIDetectRange();	
+	
+	// UKismetSystemLibrary::SphereTraceMultiForObjects
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, ControllingPawn);
 	bool bResult = World->OverlapMultiByChannel(

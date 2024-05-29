@@ -2,7 +2,7 @@
 
 
 #include "AI/BTTask_Attack.h"
-#include "AIController.h"
+#include "TGAI.h"
 #include "Interface/TGCharacterAIInterface.h"
 
 UBTTask_Attack::UBTTask_Attack()
@@ -19,6 +19,10 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	{
 		return EBTNodeResult::Failed;
 	}
+
+	// 1. Enemy BP의 Event Dispatchers 추가 : OnAttackEnd
+	// 2. 몽타주 Completed, Interrupted에 연결
+	// 3. BT Attack에서 Assign On Attack End 추가
 
 	ITGCharacterAIInterface* AIPawn = Cast<ITGCharacterAIInterface>(ControllingPawn);
 	if (nullptr == AIPawn)
