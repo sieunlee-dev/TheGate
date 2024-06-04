@@ -20,8 +20,7 @@ EBTNodeResult::Type UBTTask_ClearFocus::ExecuteTask(UBehaviorTreeComponent& Owne
 		return EBTNodeResult::Failed;
 	}
 
-	// AIController->ClearFocus(EAIFocusPriority::Gameplay);
-	AIController->K2_ClearFocus();
+	AIController->ClearFocus(EAIFocusPriority::Gameplay);
 	
 	return EBTNodeResult::Succeeded;
 }

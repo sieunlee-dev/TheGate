@@ -9,6 +9,7 @@
 
 
 #define BTT_ATTACK TEXT("Attack");
+#define BTT_DEFAULT_ATTACK TEXT("DefaultAttack");
 #define BTT_CLEAR_FOCUS TEXT("ClearFocus");
 #define BTT_FOCUS_TARGET TEXT("FocusTarget");
 #define BTT_DEFAUL_TATTACK TEXT("DefatulAttack");

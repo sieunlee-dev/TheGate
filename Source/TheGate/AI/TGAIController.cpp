@@ -49,3 +49,4 @@ void ATGAIController::OnPossess(APawn* InPawn)
 	
 	RunAI();
 }
+

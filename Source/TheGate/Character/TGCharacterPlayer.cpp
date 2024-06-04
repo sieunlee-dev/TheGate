@@ -14,17 +14,17 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 
 #pragma region Mesh
 
-	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"));
-	//if (CharacterMeshRef.Object)
-	//{
-	//	GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	//}
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"));
+	if (CharacterMeshRef.Object)
+	{
+		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
+	}
 
-	//static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/TheGate/Blueprint/ABP_TG_Player.ABP_TG_Player_C"));
-	//if (AnimInstanceClassRef.Class)
-	//{
-	//	GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	//}
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/TheGate/Blueprint/ABP_TG_Player.ABP_TG_Player_C"));
+	if (AnimInstanceClassRef.Class)
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
+	}
 
 #pragma endregion
 

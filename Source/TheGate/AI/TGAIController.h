@@ -16,12 +16,13 @@ class THEGATE_API ATGAIController : public AAIController
 	
 public:
 	ATGAIController();
-
 	void RunAI();
 	void StopAI();
 	
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
+
+
 
 private:
 	UPROPERTY()

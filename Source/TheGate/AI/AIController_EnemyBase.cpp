@@ -12,21 +12,21 @@
 
 AAIController_EnemyBase::AAIController_EnemyBase()
 {
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(TEXT("/Game/TheGate/Enemies/AI/BB_Enemy_Base.BB_Enemy_Base"));
+	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(TEXT("/Game/TheGate/Enemies/AI/BehaviorTree/BB_Enemy_Base.BB_Enemy_Base"));
 	if (nullptr != BBAssetRef.Object)
 	{
 		BBAsset = BBAssetRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTAssetRef(TEXT("/Game/TheGate/Enemies/AI/BT_Enemy_Base.BT_Enemy_Base"));
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTAssetRef(TEXT("/Game/TheGate/Enemies/AI/BehaviorTree/BT_Enemy_Base.BT_Enemy_Base"));
 	if (nullptr != BTAssetRef.Object)
 	{
 		BTAsset = BTAssetRef.Object;
 	}
 
 	// Perception Comp
-	AIPerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception"));
-	//AIPerceptionComp->GetSenseConfig();
+	//AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception"));
+	//AIPerceptionComponent->GetSenseConfig();
 
 	AIState = EAIState::Passive;
 }
@@ -65,16 +65,19 @@ void AAIController_EnemyBase::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	// Set BT Delay
+	// OnPossess는 BeinPlay 이전에 실행되므로
+	// Set Value값들이 할당된 이후에 실행시키기 위해 딜레이를 준다
 	const float Duration = .2f;
-	FTimerHandle DelayTimerHandle;
+	DelayTimerHandle.Invalidate();
 	GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, FTimerDelegate::CreateLambda([&]()
 		{
 			RunAI();
-
-			GetWorld()->GetTimerManager().ClearTimer(DelayTimerHandle);
 		}), Duration, false);
+}
 
+void AAIController_EnemyBase::OnUnPossess()
+{
+	GetWorld()->GetTimerManager().ClearTimer(DelayTimerHandle);
 }
 
 void AAIController_EnemyBase::SetStateAsPassive()

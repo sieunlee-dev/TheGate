@@ -31,6 +31,7 @@ public:
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override; 
 
 // States
 public:
@@ -50,17 +51,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State)
 	EAIState AIState;
 
-private:
-	UPROPERTY()
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Custom, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UBlackboardData> BBAsset;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Custom, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UBehaviorTree> BTAsset;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Custom, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class ATGCharacterPlayer> PlayerCharacter;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AIPerception, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAIPerceptionComponent> AIPerceptionComp;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Custom, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAIPerceptionComponent> AIPerceptionComponent;
+
+private:
+	FTimerHandle DelayTimerHandle;
 
 };
