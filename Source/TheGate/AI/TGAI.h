@@ -4,7 +4,7 @@
 #define BBKEY_HOMEPOS TEXT("HomePos")
 #define BBKEY_PATROLPOS TEXT("PatrolPos")
 #define BBKEY_TARGET TEXT("Target")
-#define BBKEY_ATTACK_TARGET TEXT("AttackTarget")
+#define BBKEY_ATTACK_TARGET TEXT("TargetActor")
 #define BBKEY_AISTATE TEXT("AIState")
 
 
