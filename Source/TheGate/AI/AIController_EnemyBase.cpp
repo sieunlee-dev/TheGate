@@ -72,6 +72,7 @@ void AAIController_EnemyBase::OnPossess(APawn* InPawn)
 	GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, FTimerDelegate::CreateLambda([&]()
 		{
 			RunAI();
+			
 		}), Duration, false);
 }
 
