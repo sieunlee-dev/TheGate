@@ -14,7 +14,7 @@ void UTGHpBarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	HpProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PBHpBar")));
+	HpProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HpBar")));
 	ensure(HpProgressBar);
 
 	ITGCharacterWidgetInterface* CharacterWidget = Cast<ITGCharacterWidgetInterface>(OwningActor);
@@ -30,6 +30,5 @@ void UTGHpBarWidget::UpdateHpBar(float NewCurrentHp)
 	if (HpProgressBar)
 	{
 		HpProgressBar->SetPercent(NewCurrentHp / MaxHp);
-		//UE_LOG(LogTemp, Log, TEXT("Current HP : %f"), NewCurrentHp);
 	}
 }

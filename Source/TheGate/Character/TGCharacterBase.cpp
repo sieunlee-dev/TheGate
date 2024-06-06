@@ -44,19 +44,6 @@ ATGCharacterBase::ATGCharacterBase()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(CPROFILE_NOCOLLISION);
 
-	// Player
-	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"));
-	//if (CharacterMeshRef.Object)
-	//{
-	//	GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	//}
-
-	//static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/TheGate/Blueprint/ABP_TG_Player.ABP_TG_Player_C"));
-	//if (AnimInstanceClassRef.Class)
-	//{
-	//	GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	//}
-
 #pragma endregion
 
 #pragma region Input Assets
@@ -108,18 +95,18 @@ ATGCharacterBase::ATGCharacterBase()
 	// Stat Component
 	Stat = CreateDefaultSubobject<UTGCharacterStatComponent>(TEXT("Stat"));
 
-	// Widget Component
-	HpBar = CreateDefaultSubobject<UTGWidgetComponent>(TEXT("Widget"));
-	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
-	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/TheGate/UI/WBP_HpBar.WBP_HpBar_C"));
-	if (HpBarWidgetRef.Class)
-	{
-		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
-		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
-		HpBar->SetDrawSize(FVector2D(150.0f, 15.0f));
-		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
+	//// Widget Component
+	//HpBar = CreateDefaultSubobject<UTGWidgetComponent>(TEXT("Widget"));
+	//HpBar->SetupAttachment(GetMesh());
+	//HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 200.f)); 
+	//static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/TheGate/UI/WBP_HpBar.WBP_HpBar_C"));
+	//if (HpBarWidgetRef.Class)
+	//{
+	//	HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+	//	HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+	//	HpBar->SetDrawSize(FVector2D(200.f, 20.f));
+	//	HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//}
 
 #pragma endregion
 
@@ -136,7 +123,6 @@ ATGCharacterBase::ATGCharacterBase()
 
 #pragma endregion
 	
-
 }
 
 void ATGCharacterBase::PostInitializeComponents()
@@ -216,6 +202,7 @@ void ATGCharacterBase::ComboActionEnd(UAnimMontage* TargetMontage, bool IsProper
 
 void ATGCharacterBase::NotifyComboActionEnd()
 {
+
 }
 
 void ATGCharacterBase::SetComboCheckTimer()
@@ -288,7 +275,6 @@ float ATGCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	DeadDirection = .0 < ForwardDirection.X ? 1 : 0;	
 
-
 	//SetDead();
 	Stat->ApplyDamage(DamageAmount);
 
@@ -357,7 +343,7 @@ void ATGCharacterBase::SetSprint(const bool& bIsSprinting)
 	//GetCharacterMovement()->MaxWalkSpeed = (bIsSprinting ? Stat->GetTotalStat().SprintSpeed : Stat->GetTotalStat().JogSpeed);
 	//UE_LOG(LogTemp, Log, TEXT("Sprint : %f / Default : %f"), SprintSpeed, DefaultSpeed);
 
-	const float MovementSpd = Stat->GetTotalStat().MovementSpeed;
+	const float MovementSpd = /*Stat->GetTotalStat().MovementSpeed*/400.f;
 	GetCharacterMovement()->MaxWalkSpeed = (bIsSprinting ? MovementSpd * 1.5f : MovementSpd);
 }
 
