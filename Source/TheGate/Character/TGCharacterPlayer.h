@@ -78,6 +78,11 @@ protected:
 #pragma endregion
 
 	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UTGGrabberComponent> GrabberComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UPhysicsHandleComponent> PhysicsHandleComponent;
 
 };

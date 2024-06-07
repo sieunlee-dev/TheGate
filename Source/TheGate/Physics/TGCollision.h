@@ -7,3 +7,4 @@
 #define CPROFILE_TGTRIGGER TEXT("TGTrigger")
 #define CPROFILE_TGCAMERA TEXT("TGCamera")
 #define CCHANNEL_TGACTION ECC_GameTraceChannel1
+#define CCHANNEL_TGGRABBER ECC_GameTraceChannel2

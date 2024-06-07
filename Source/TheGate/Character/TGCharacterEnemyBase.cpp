@@ -26,7 +26,6 @@ ATGCharacterEnemyBase::ATGCharacterEnemyBase()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
-	// 카메라 클리핑 제거 -> 미리 지정한 충돌 채널
 	GetMesh()->SetCollisionProfileName(CPROFILE_TGCAMERA);
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_TGCAMERA);
 

@@ -8,6 +8,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "TGCharacterControlData.h"
+#include "Component/TGGrabberComponent.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ATGCharacterPlayer::ATGCharacterPlayer()
 {
@@ -27,7 +30,6 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 	}
 
 #pragma endregion
-
 
 #pragma region Camera
 
@@ -87,6 +89,18 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 	}
 
 	CurrentCharacterControlType = ECharacterControlType::Shoulder;
+
+#pragma endregion
+
+
+#pragma region Component
+
+	GrabberComponent = CreateDefaultSubobject<UTGGrabberComponent>(TEXT("Grabber"));
+	ensure(GrabberComponent != nullptr);
+	GrabberComponent->SetupAttachment(GetCapsuleComponent());
+
+	PhysicsHandleComponent = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
+	ensure(PhysicsHandleComponent != nullptr);
 
 #pragma endregion
 
@@ -183,17 +197,21 @@ void ATGCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+
+
+	/// 
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	FHitResult HitResult;
+	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
+
+	FVector LookAtDirection = HitResult.ImpactPoint - GetActorLocation();
+	FRotator LooAtRotation = FRotator(0.f, LookAtDirection.Rotation().Yaw, 0.f);
+	
+	GrabberComponent->MouseRotator = LooAtRotation;
 }
 
 void ATGCharacterPlayer::QuaterMove(const FInputActionValue& Value)
 {
-	//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	//if (!AnimInstance->Montage_IsPlaying(StopMontage))
-	//{
-	//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	//	GetWorldTimerManager().ClearTimer(StopTimerHandle);
-	//}
-
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	float InputSizeSquared = MovementVector.SquaredLength();
