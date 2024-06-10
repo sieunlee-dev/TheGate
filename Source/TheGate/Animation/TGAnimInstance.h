@@ -83,6 +83,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float JumpingThreshould;	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Character)
+	float Direction;
+
+
 protected:
 	virtual void CheckLocomotion();
 	virtual void CheckJumpmotion();
