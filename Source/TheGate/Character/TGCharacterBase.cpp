@@ -46,21 +46,6 @@ ATGCharacterBase::ATGCharacterBase()
 
 #pragma endregion
 
-#pragma region Input Assets
-
-	static ConstructorHelpers::FObjectFinder<UTGCharacterControlData> ShoulderDataRef(TEXT("/Game/TheGate/DataAsset/Control/TGC_Shoulder.TGC_Shoulder"));
-	if (ShoulderDataRef.Object)
-	{
-		CharacterControlManager.Add(ECharacterControlType::Shoulder, ShoulderDataRef.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UTGCharacterControlData> QuaterDataRef(TEXT("/Game/TheGate/DataAsset/Control/TGC_Quater.TGC_Quater"));
-	if (QuaterDataRef.Object)
-	{
-		CharacterControlManager.Add(ECharacterControlType::Quater, QuaterDataRef.Object);
-	}
-
-#pragma endregion
 
 #pragma region Montage Assets
 
