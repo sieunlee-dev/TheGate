@@ -42,8 +42,6 @@ public:
 protected:
 	virtual void SetCharacterControlData(const class UTGCharacterControlData* CharacterControlData);
 
-	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
-	TMap<ECharacterControlType, class UTGCharacterControlData*> CharacterControlManager;
 	
 // Combo Action Section
 protected:

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/TGCharacterBase.h"
 #include "InputActionValue.h"
+#include "GameData/TGEnums.h"
 #include "TGCharacterPlayer.generated.h"
 
 /**
@@ -26,9 +27,12 @@ public:
 
 // Character Control Section
 protected:
+	virtual void SetCharacterControlData(const class UTGCharacterControlData* CharacterControlData) override;
 	void ChangeCharacterControl();
 	void SetCharacterControl(ECharacterControlType NewCharacterControlType);
-	virtual void SetCharacterControlData(const class UTGCharacterControlData* CharacterControlData) override;
+
+	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
+	TMap<ECharacterControlType, class UTGCharacterControlData*> CharacterControlManager;
 	
 // Camera Section
 protected:
@@ -79,10 +83,26 @@ protected:
 
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UTGGrabberComponent> GrabberComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPhysicsHandleComponent> PhysicsHandleComponent;
 
+// Stance Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
+	EPlayerStance PlayerStance;
+
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void SetMagicStance();
+
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void SetDefaultStance();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
+	float MagicWalkSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
+	float DefaultWalkSpeed;
 };

@@ -10,7 +10,11 @@
 #include "TGCharacterControlData.h"
 #include "Component/TGGrabberComponent.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/Widget.h"
 
 ATGCharacterPlayer::ATGCharacterPlayer()
 {
@@ -23,12 +27,11 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/TheGate/Blueprint/ABP_TG_Player.ABP_TG_Player_C"));
-	if (AnimInstanceClassRef.Class)
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	}
-
+	//static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/TheGate/Blueprint/ABP_Player.ABP_Player_C"));
+	//if (AnimInstanceClassRef.Class)
+	//{
+	//	GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
+	//}
 #pragma endregion
 
 #pragma region Camera
@@ -46,6 +49,20 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 
 #pragma region Input
 
+	// Add IMC
+	static ConstructorHelpers::FObjectFinder<UTGCharacterControlData> ShoulderDataRef(TEXT("/Game/TheGate/DataAsset/Control/TGC_Shoulder.TGC_Shoulder"));
+	if (ShoulderDataRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Shoulder, ShoulderDataRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UTGCharacterControlData> QuaterDataRef(TEXT("/Game/TheGate/DataAsset/Control/TGC_Quater.TGC_Quater"));
+	if (QuaterDataRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Quater, QuaterDataRef.Object);
+	}
+
+	// Add IA
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionJumpRef(TEXT("/Game/TheGate/Input/Actions/IA_Jump.IA_Jump"));
 	if (nullptr != InputActionJumpRef.Object)
 	{
@@ -92,7 +109,6 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 
 #pragma endregion
 
-
 #pragma region Component
 
 	GrabberComponent = CreateDefaultSubobject<UTGGrabberComponent>(TEXT("Grabber"));
@@ -104,7 +120,7 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 
 #pragma endregion
 
-
+	PlayerStance = EPlayerStance::Default;
 }
 
 void ATGCharacterPlayer::BeginPlay()
@@ -112,6 +128,28 @@ void ATGCharacterPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	SetCharacterControl(CurrentCharacterControlType);
+
+}
+
+void ATGCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
+{
+	UTGCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
+	check(NewCharacterControl);
+
+	SetCharacterControlData(NewCharacterControl);
+
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	{
+		Subsystem->ClearAllMappings();
+		UInputMappingContext* NewMappingContext = NewCharacterControl->InputMappingContext;
+		if (NewMappingContext)
+		{
+			Subsystem->AddMappingContext(NewMappingContext, 0);
+		}
+	}
+
+	CurrentCharacterControlType = NewCharacterControlType;
 }
 
 void ATGCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -143,26 +181,7 @@ void ATGCharacterPlayer::ChangeCharacterControl()
 	}
 }
 
-void ATGCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
-{
-	UTGCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
-	check(NewCharacterControl);
 
-	SetCharacterControlData(NewCharacterControl);
-
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	{
-		Subsystem->ClearAllMappings();
-		UInputMappingContext* NewMappingContext = NewCharacterControl->InputMappingContext;
-		if (NewMappingContext)
-		{
-			Subsystem->AddMappingContext(NewMappingContext, 0);
-		}
-	}
-
-	CurrentCharacterControlType = NewCharacterControlType;
-}
 
 void ATGCharacterPlayer::SetCharacterControlData(const UTGCharacterControlData* CharacterControlData)
 {
@@ -244,3 +263,23 @@ void ATGCharacterPlayer::Attack()
 	// Pressed Key
 	Super::ProcessComboCommand();
 }
+
+void ATGCharacterPlayer::SetMagicStance()
+{
+	PlayerStance = EPlayerStance::Magic;
+
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	GetCharacterMovement()->MaxWalkSpeed = MagicWalkSpeed;
+}
+
+
+void ATGCharacterPlayer::SetDefaultStance()
+{
+	PlayerStance = EPlayerStance::Default;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
+}
+

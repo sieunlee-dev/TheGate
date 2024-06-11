@@ -13,7 +13,7 @@ ATGGameMode::ATGGameMode()
 
 	// DefaultPawnClass
 	//static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/TheGate.TGCharacterPlayer"));  // C++ Char
-	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Game/TheGate/Blueprint/BP_TG_Player.BP_TG_Player_C"));
+	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Game/TheGate/Player/BP_TG_Player.BP_TG_Player_C"));
 	if (DefaultPawnClassRef.Class)
 	{
 		DefaultPawnClass = DefaultPawnClassRef.Class;
