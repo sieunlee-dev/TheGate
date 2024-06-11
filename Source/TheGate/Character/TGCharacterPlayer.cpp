@@ -23,12 +23,11 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/TheGate/Blueprint/ABP_TG_Player.ABP_TG_Player_C"));
-	if (AnimInstanceClassRef.Class)
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	}
-
+	//static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/TheGate/Blueprint/ABP_Player.ABP_Player_C"));
+	//if (AnimInstanceClassRef.Class)
+	//{
+	//	GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
+	//}
 #pragma endregion
 
 #pragma region Camera
@@ -104,7 +103,6 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 
 #pragma endregion
 
-
 }
 
 void ATGCharacterPlayer::BeginPlay()
@@ -112,6 +110,7 @@ void ATGCharacterPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	SetCharacterControl(CurrentCharacterControlType);
+
 }
 
 void ATGCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
