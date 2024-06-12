@@ -106,17 +106,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> JogMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
-	float DefaultSpeed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
-	float SprintSpeed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
-	bool isCanMove;
-
-	void SetSprint(const bool& bIsSprinting);
-
 // DoubleJump Section
 
 

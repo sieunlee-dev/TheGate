@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
 #include "TGMoverComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class THEGATE_API UTGMoverComponent : public UActorComponent
+class THEGATE_API UTGMoverComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
@@ -23,6 +23,26 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+public:
+	class UCharacterMovementComponent* GetMovementComponent() const;
+	const float& GetMovementSpeed(const bool& OutIsSprint) const { return OutIsSprint ? SprintSpeed : DefaultSpeed ; }
+	const bool& GetIsCanMove() const { return bIsCanMove; }
+
+public:
+	void ShoulderMove(APawn* const InPawn, const FVector2D& MovementVector);
+	void ShoulderLook(APawn* const InPawn, const FVector2D& LookAxisVector);
+	void QuaterMove(APawn* const InPawn, FVector2D& MovementVector);
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, Meta = (AllowPrivateAccess = "true"))
+	float DefaultSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, Meta = (AllowPrivateAccess = "true"))
+	float SprintSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, Meta = (AllowPrivateAccess = "true"))
+	bool bIsCanMove;
 
 private:
 	UPROPERTY(EditAnywhere)

@@ -7,9 +7,6 @@
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Components/PrimitiveComponent.h"
 
-#include "Kismet/GameplayStatics.h"
-#include "Character/TGCharacterPlayer.h"
-
 // Sets default values for this component's properties
 UTGGrabberComponent::UTGGrabberComponent()
 {
@@ -26,9 +23,6 @@ UTGGrabberComponent::UTGGrabberComponent()
 void UTGGrabberComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	PlayerCharacter = Cast<ATGCharacterPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 }
 

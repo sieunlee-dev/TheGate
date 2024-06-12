@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "TGCharacterControlData.h"
+#include "Component/TGMoverComponent.h"
 #include "Component/TGGrabberComponent.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
@@ -18,7 +19,7 @@
 
 ATGCharacterPlayer::ATGCharacterPlayer()
 {
-
+	PlayerStance = EPlayerStance::Default;
 #pragma region Mesh
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"));
@@ -109,7 +110,11 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 
 #pragma endregion
 
-#pragma region Component
+#pragma region Components
+
+	MoverComponent = CreateDefaultSubobject<UTGMoverComponent>(TEXT("Mover"));
+	ensure(MoverComponent != nullptr);
+	MoverComponent->SetupAttachment(GetCapsuleComponent());
 
 	GrabberComponent = CreateDefaultSubobject<UTGGrabberComponent>(TEXT("Grabber"));
 	ensure(GrabberComponent != nullptr);
@@ -120,7 +125,6 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 
 #pragma endregion
 
-	PlayerStance = EPlayerStance::Default;
 }
 
 void ATGCharacterPlayer::BeginPlay()
@@ -158,15 +162,17 @@ void ATGCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Player
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+	//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::Jumping);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ATGCharacterPlayer::Jumping);
 	EnhancedInputComponent->BindAction(ChangeControlAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::ChangeCharacterControl);
 	EnhancedInputComponent->BindAction(ShoulderMoveAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::ShoulderMove);
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::ShoulderLook);
 	EnhancedInputComponent->BindAction(QuaterMoveAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::QuaterMove);
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::Attack);
-	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ATGCharacterPlayer::Sprint);
-	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATGCharacterPlayer::Sprint);
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ATGCharacterPlayer::Sprinting);
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATGCharacterPlayer::Sprinting);
 }
 
 void ATGCharacterPlayer::ChangeCharacterControl()
@@ -180,8 +186,6 @@ void ATGCharacterPlayer::ChangeCharacterControl()
 		SetCharacterControl(ECharacterControlType::Quater);
 	}
 }
-
-
 
 void ATGCharacterPlayer::SetCharacterControlData(const UTGCharacterControlData* CharacterControlData)
 {
@@ -198,27 +202,22 @@ void ATGCharacterPlayer::SetCharacterControlData(const UTGCharacterControlData* 
 
 void ATGCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
 {
+	if (!MoverComponent->GetIsCanMove())
+		return;
+
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-	AddMovementInput(ForwardDirection, MovementVector.X);
-	AddMovementInput(RightDirection, MovementVector.Y);
+	MoverComponent->ShoulderMove(this, MovementVector);
 }
 
 void ATGCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 {
+	if (!MoverComponent->GetIsCanMove())
+		return;
+
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	MoverComponent->ShoulderLook(this, LookAxisVector);
 
-	AddControllerYawInput(LookAxisVector.X);
-	AddControllerPitchInput(LookAxisVector.Y);
-
-
-	/// 
+	/// Grabber Test
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	FHitResult HitResult;
 	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
@@ -231,31 +230,27 @@ void ATGCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 
 void ATGCharacterPlayer::QuaterMove(const FInputActionValue& Value)
 {
+	if (!MoverComponent->GetIsCanMove())
+		return;
+
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	float InputSizeSquared = MovementVector.SquaredLength();
-	float MovementVectorSize = 1.0f;
-	float MovementVectorSizeSquared = MovementVector.SquaredLength();
-	if (MovementVectorSizeSquared > 1.0f)
-	{
-		MovementVector.Normalize();
-		MovementVectorSizeSquared = 1.0f;
-	}
-	else
-	{
-		MovementVectorSize = FMath::Sqrt(MovementVectorSizeSquared);
-	}
-
-	FVector MoveDirection = FVector(MovementVector.X, MovementVector.Y, 0.0f);
-	GetController()->SetControlRotation(FRotationMatrix::MakeFromX(MoveDirection).Rotator());
-	AddMovementInput(MoveDirection, MovementVectorSize);
+	MoverComponent->QuaterMove(this, MovementVector);
 }
 
-void ATGCharacterPlayer::Sprint(const FInputActionValue& Value)
+void ATGCharacterPlayer::Jumping(const FInputActionValue& Value)
 {
-	//FVector2D MovementVector = Value.Get<FVector2D>();
-	//UE_LOG(LogTemp, Log, TEXT("X: %f / Y: %f"), MovementVector.X, MovementVector.Y);
-	Super::SetSprint(Value.IsNonZero());
+	if (!MoverComponent->GetIsCanMove())
+		return;
+
+	Value.IsNonZero() ? Jump() : StopJumping();
+}
+
+void ATGCharacterPlayer::Sprinting(const FInputActionValue& Value)
+{
+	//GetCharacterMovement()->MaxWalkSpeed = (bIsSprinting ? Stat->GetTotalStat().SprintSpeed : Stat->GetTotalStat().JogSpeed);
+	//UE_LOG(LogTemp, Log, TEXT("Sprint : %f / Default : %f"), SprintSpeed, DefaultSpeed);
+
+	GetCharacterMovement()->MaxWalkSpeed = MoverComponent->GetMovementSpeed(Value.IsNonZero());
 }
 
 void ATGCharacterPlayer::Attack()
@@ -281,5 +276,10 @@ void ATGCharacterPlayer::SetDefaultStance()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
+}
+
+void ATGCharacterPlayer::SetCameraOffset(const FVector& OutOffset)
+{
+	CameraBoom->SocketOffset = OutOffset;
 }
 

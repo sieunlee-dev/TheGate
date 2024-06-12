@@ -65,12 +65,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> RollAction;
 
+	ECharacterControlType CurrentCharacterControlType;
+
+protected:
 	void ShoulderMove(const FInputActionValue& Value);
 	void ShoulderLook(const FInputActionValue& Value);
 	void QuaterMove(const FInputActionValue& Value);
-	void Sprint(const FInputActionValue& Value);
-	 
-	ECharacterControlType CurrentCharacterControlType;
+	void Jumping(const FInputActionValue& Value);
+	void Sprinting(const FInputActionValue& Value);	
 
 #pragma region // Montage Test
 
@@ -83,10 +85,13 @@ protected:
 
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UTGMoverComponent> MoverComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UTGGrabberComponent> GrabberComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPhysicsHandleComponent> PhysicsHandleComponent;
 
 // Stance Section
@@ -100,9 +105,19 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Custom Function")
 	void SetDefaultStance();
 
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void SetCameraOffset(const FVector& OutOffset);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
 	float MagicWalkSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
 	float DefaultWalkSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
+	FVector AimBoomOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
+	FVector DefaultBoomOffset;
+	
 };

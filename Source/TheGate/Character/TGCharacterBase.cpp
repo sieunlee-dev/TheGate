@@ -323,15 +323,6 @@ void ATGCharacterBase::StopAnimEnd()
 	}
 }
 
-void ATGCharacterBase::SetSprint(const bool& bIsSprinting)
-{
-	//GetCharacterMovement()->MaxWalkSpeed = (bIsSprinting ? Stat->GetTotalStat().SprintSpeed : Stat->GetTotalStat().JogSpeed);
-	//UE_LOG(LogTemp, Log, TEXT("Sprint : %f / Default : %f"), SprintSpeed, DefaultSpeed);
-
-	const float MovementSpd = /*Stat->GetTotalStat().MovementSpeed*/400.f;
-	GetCharacterMovement()->MaxWalkSpeed = (bIsSprinting ? MovementSpd * 1.5f : MovementSpd);
-}
-
 void ATGCharacterBase::TakeItem(UTGItemData* InItemData)
 {
 	if (InItemData)

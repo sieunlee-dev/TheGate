@@ -36,9 +36,6 @@ public:
 
 	FRotator MouseRotator;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class ATGCharacterPlayer> PlayerCharacter;
-
 private:
 	UPROPERTY(EditAnywhere)
 	float MaxGrabDistance = 400.f;
