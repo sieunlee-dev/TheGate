@@ -133,6 +133,8 @@ void ATGCharacterPlayer::BeginPlay()
 
 	SetCharacterControl(CurrentCharacterControlType);
 
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->OnMontageEnded.AddDynamic(this, &ATGCharacterPlayer::HitActionEnd);
 }
 
 void ATGCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
@@ -162,8 +164,6 @@ void ATGCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Player
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-	//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::Jumping);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ATGCharacterPlayer::Jumping);
 	EnhancedInputComponent->BindAction(ChangeControlAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::ChangeCharacterControl);
@@ -200,6 +200,27 @@ void ATGCharacterPlayer::SetCharacterControlData(const UTGCharacterControlData* 
 	CameraBoom->bDoCollisionTest = CharacterControlData->bDoCollisionTest;
 }
 
+
+void ATGCharacterPlayer::HitActionBegin()
+{
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	DisableInput(PlayerController);
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(HitMontage);
+
+	// OnCompleted 델리게이트
+	//FOnMontageEnded EndDelegate;
+	//EndDelegate.BindUObject(this, &ATGCharacterPlayer::HitActionEnd);
+	//AnimInstance->Montage_SetEndDelegate(EndDelegate, HitMontage);
+}
+
+void ATGCharacterPlayer::HitActionEnd(UAnimMontage* TargetMontage, bool bInterrupted)
+{
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	EnableInput(PlayerController);
+}
+
 void ATGCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
 {
 	if (!MoverComponent->GetIsCanMove())
@@ -211,8 +232,8 @@ void ATGCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
 
 void ATGCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 {
-	if (!MoverComponent->GetIsCanMove())
-		return;
+	//if (!MoverComponent->GetIsCanMove())
+	//	return;
 
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	MoverComponent->ShoulderLook(this, LookAxisVector);

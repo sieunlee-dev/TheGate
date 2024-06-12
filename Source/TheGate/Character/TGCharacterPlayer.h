@@ -67,6 +67,12 @@ protected:
 
 	ECharacterControlType CurrentCharacterControlType;
 
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void HitActionBegin();
+
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void HitActionEnd(class UAnimMontage* TargetMontage, bool bInterrupted = true);
+
 protected:
 	void ShoulderMove(const FInputActionValue& Value);
 	void ShoulderLook(const FInputActionValue& Value);

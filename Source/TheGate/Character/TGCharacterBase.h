@@ -45,10 +45,10 @@ protected:
 	
 // Combo Action Section
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combo)
 	TObjectPtr<class UAnimMontage> ComboActionMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UTGComboActionData> ComboActionData;
 
 	void ProcessComboCommand();
@@ -68,10 +68,13 @@ protected:
 protected:
 	virtual void AttackHitCheck() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> HitMontage;
 
 // Dead Section
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
 
 	virtual void SetDead();
@@ -93,7 +96,7 @@ protected:
 	virtual void SetupCharacterWidget(class UTGUserWidget* InUserWidget) override;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> StopMontage;
 
 	void StopAnimBegin();
@@ -103,7 +106,7 @@ protected:
 
 // Sprint Section
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> JogMontage;
 
 // DoubleJump Section
