@@ -36,12 +36,12 @@ void UTGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 #if ENABLE_DRAW_DEBUG
 
 		//FName EnumToName = FName(TEXT("Invalid"));
-		////const UEnum* Enums = FindObject<UEnum>(ANY_PACKAGE, TEXT("ELocomotionType"), true);
-		//const UEnum* Enums = FindObject<UEnum>(ANY_PACKAGE, TEXT("EJumpmotionType"), true);
+		//const UEnum* Enums = FindObject<UEnum>(ANY_PACKAGE, TEXT("ELocomotionType"), true);
+		////const UEnum* Enums = FindObject<UEnum>(ANY_PACKAGE, TEXT("EJumpmotionType"), true);
 		//if (Enums)
 		//{
-		//	//EnumToName = Enums->GetNameByValue((int64)LocomotionType);
-		//	EnumToName = Enums->GetNameByValue((int64)JumpmotionType);
+		//	EnumToName = Enums->GetNameByValue((int64)LocomotionType);
+		//	//EnumToName = Enums->GetNameByValue((int64)JumpmotionType);
 		//}
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, EnumToName.ToString());
 
