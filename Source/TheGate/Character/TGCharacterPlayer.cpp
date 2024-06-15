@@ -201,13 +201,16 @@ void ATGCharacterPlayer::SetCharacterControlData(const UTGCharacterControlData* 
 }
 
 
-void ATGCharacterPlayer::HitActionBegin()
+void ATGCharacterPlayer::HitActionBegin(const int& OutIndex)
 {
+	if (HitMontages[OutIndex] == nullptr)
+		return;
+
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	DisableInput(PlayerController);
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(HitMontage);
+	AnimInstance->Montage_Play(HitMontages[OutIndex]);
 
 	// OnCompleted 델리게이트
 	//FOnMontageEnded EndDelegate;

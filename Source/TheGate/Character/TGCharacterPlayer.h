@@ -68,7 +68,7 @@ protected:
 	ECharacterControlType CurrentCharacterControlType;
 
 	UFUNCTION(BlueprintCallable, Category = "Custom Function")
-	void HitActionBegin();
+	void HitActionBegin(const int& OutIndex);
 
 	UFUNCTION(BlueprintCallable, Category = "Custom Function")
 	void HitActionEnd(class UAnimMontage* TargetMontage, bool bInterrupted = true);
