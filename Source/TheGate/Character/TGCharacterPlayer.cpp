@@ -220,6 +220,8 @@ void ATGCharacterPlayer::HitActionBegin(const int& OutIndex)
 
 void ATGCharacterPlayer::HitActionEnd(UAnimMontage* TargetMontage, bool bInterrupted)
 {
+	// 성공, 방해 둘다 바인딩?
+
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	EnableInput(PlayerController);
 }
