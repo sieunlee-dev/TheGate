@@ -133,8 +133,9 @@ void ATGCharacterPlayer::BeginPlay()
 
 	SetCharacterControl(CurrentCharacterControlType);
 
+	// 애님 이벤트 바인딩
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->OnMontageEnded.AddDynamic(this, &ATGCharacterPlayer::HitActionEnd);
+	AnimInstance->OnMontageEnded.AddDynamic(this, &ATGCharacterPlayer::OnHitActionEnd);
 }
 
 void ATGCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
@@ -201,16 +202,16 @@ void ATGCharacterPlayer::SetCharacterControlData(const UTGCharacterControlData* 
 }
 
 
-void ATGCharacterPlayer::HitActionBegin(const int& OutIndex)
+void ATGCharacterPlayer::HitActionBegin(FString KeyName)
 {
-	if (HitMontages[OutIndex] == nullptr)
+	if (!HitMontages.Contains(KeyName))
 		return;
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	DisableInput(PlayerController);
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(HitMontages[OutIndex]);
+	AnimInstance->Montage_Play(HitMontages[KeyName]);
 
 	// OnCompleted 델리게이트
 	//FOnMontageEnded EndDelegate;
@@ -218,7 +219,7 @@ void ATGCharacterPlayer::HitActionBegin(const int& OutIndex)
 	//AnimInstance->Montage_SetEndDelegate(EndDelegate, HitMontage);
 }
 
-void ATGCharacterPlayer::HitActionEnd(UAnimMontage* TargetMontage, bool bInterrupted)
+void ATGCharacterPlayer::OnHitActionEnd(UAnimMontage* TargetMontage, bool bInterrupted)
 {
 	// 성공, 방해 둘다 바인딩?
 

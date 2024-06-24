@@ -20,6 +20,7 @@ USTRUCT(Atomic, BlueprintType)
 struct FDamageInfo
 {
 	GENERATED_USTRUCT_BODY()
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Amount;

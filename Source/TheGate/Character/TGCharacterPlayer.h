@@ -5,8 +5,21 @@
 #include "CoreMinimal.h"
 #include "Character/TGCharacterBase.h"
 #include "InputActionValue.h"
-#include "GameData/TGEnums.h"
 #include "TGCharacterPlayer.generated.h"
+
+UENUM(BlueprintType)
+enum class EPlayerStance : uint8
+{
+	Default UMETA(DisplayName = "Default"),
+	Magic UMETA(DisplayName = "Magic"),
+};
+
+template<typename EPlayerStance>
+static __forceinline FString GetEnumerationToString(const EPlayerStance& InValue)
+{
+	// UE_LOG(LogClass, Warning, TEXT("View Mode : %S"), *GetEnumerationToString(Viewmode));
+	return StaticEnum<EPlayerStance>()->GetNameStringByValue(static_cast<int64>(InValue));
+}
 
 /**
  * 
@@ -15,7 +28,7 @@ UCLASS()
 class THEGATE_API ATGCharacterPlayer : public ATGCharacterBase
 {
 	GENERATED_BODY()
-	
+		
 public:
 	ATGCharacterPlayer();
 
@@ -68,10 +81,10 @@ protected:
 	ECharacterControlType CurrentCharacterControlType;
 
 	UFUNCTION(BlueprintCallable, Category = "Custom Function")
-	void HitActionBegin(const int& OutIndex);
+	void HitActionBegin(FString KeyName);
 
 	UFUNCTION(BlueprintCallable, Category = "Custom Function")
-	void HitActionEnd(class UAnimMontage* TargetMontage, bool bInterrupted = true);
+	void OnHitActionEnd(class UAnimMontage* TargetMontage, bool bInterrupted = true);
 
 protected:
 	void ShoulderMove(const FInputActionValue& Value);

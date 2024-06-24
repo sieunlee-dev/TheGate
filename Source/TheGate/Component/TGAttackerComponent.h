@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "TGAttackerComponent.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEGATE_API UTGAttackerComponent : public UActorComponent
 {
@@ -20,12 +19,17 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	const UTGEnumsDamage* CreateEnumContainer();
 
-//public:
 //	UFUNCTION(BlueprintCallable, Category = "Custom Function")
 //	void MagicSpell(FTransform& OutSpawnTransform, AActor& OutTarget);
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom Enums")
+	TObjectPtr<class UTGEnumsDamage> DamageEnums;
+
+	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Custom Enums")
+	//UTGEnumsDamage* DamageEnums;
 
 };
