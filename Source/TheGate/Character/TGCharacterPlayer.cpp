@@ -16,6 +16,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/Widget.h"
+#include "TheGate.h"
 
 ATGCharacterPlayer::ATGCharacterPlayer()
 {
@@ -129,13 +130,18 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 
 void ATGCharacterPlayer::BeginPlay()
 {
+	//TG_LOG(LogTGNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
 	Super::BeginPlay();
+
+	//TG_LOG(LogTGNetwork, Log, TEXT("%s"), TEXT("End"));
 
 	SetCharacterControl(CurrentCharacterControlType);
 
 	// 애님 이벤트 바인딩
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->OnMontageEnded.AddDynamic(this, &ATGCharacterPlayer::OnHitActionEnd);
+
 }
 
 void ATGCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
