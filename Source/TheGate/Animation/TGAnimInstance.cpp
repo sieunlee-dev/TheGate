@@ -4,14 +4,13 @@
 #include "Animation/TGAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "TheGate.h"
 
 UTGAnimInstance::UTGAnimInstance()
 {
 	MovingThreshould = 3.0f;
-	JumpingThreshould = 100.0f;
+	JumpingThreshould = 10.f;
 	LocomotionType = ELocomotionType::Idle;
-	PreLocomotionType = ELocomotionType::Idle;
-	JumpmotionType = EJumpmotionType::Land;
 }
 
 void UTGAnimInstance::NativeInitializeAnimation()
@@ -37,7 +36,6 @@ void UTGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		//FName EnumToName = FName(TEXT("Invalid"));
 		//const UEnum* Enums = FindObject<UEnum>(ANY_PACKAGE, TEXT("ELocomotionType"), true);
-		////const UEnum* Enums = FindObject<UEnum>(ANY_PACKAGE, TEXT("EJumpmotionType"), true);
 		//if (Enums)
 		//{
 		//	EnumToName = Enums->GetNameByValue((int64)LocomotionType);
@@ -47,58 +45,89 @@ void UTGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 #endif
 
+		//bIsIdle = Velocity.IsZero();
+		//bIsInAir = Velocity.Z > JumpingThreshould;
+
 		Velocity = Movement->Velocity;
 		GroundSpeed = Velocity.Size2D();
-		bIsIdle = Velocity.IsZero() /*GroundSpeed < MovingThreshould*/;
-		bIsFalling = Movement->IsFalling();
-
-#pragma region trial and error
-
-		//if (bIsIdle)
-		//{
-		//	LocomotionType = ELocomotionType::Idle;
-		//}
-		//else
-		//{
-		//	if (bIsFalling)
-		//	{
-		//		LocomotionType = (Velocity.Z > JumpingThreshould) ? ELocomotionType::Jump : ELocomotionType::Fall;
-		//	}
-		//	else
-		//	{
-		//		LocomotionType = (GroundSpeed < SprintSpeed) ? ELocomotionType::Jog : ELocomotionType::Sprint;
-		//	}
-		//}
-
-#pragma endregion
+		bIsIdle = GroundSpeed < MovingThreshould;
+		bIsInAir = Movement->IsFalling();
+		bIsFlying = Movement->IsFlying();
+		bIsCrouching = Movement->IsCrouching();
 
 		CheckLocomotion();
-		CheckJumpmotion();
-		//PreLocomotionType = LocomotionType;
 	}
 }
 
 
 void UTGAnimInstance::CheckLocomotion()
 {	
-	if (bIsIdle)
+	switch (LocomotionType)
 	{
+	case ELocomotionType::Idle:
+		if (!bIsIdle)
+			LocomotionType = (GroundSpeed < SprintSpeed) ? ELocomotionType::Jog : ELocomotionType::Sprint;
+		if (bIsInAir)
+			LocomotionType = ELocomotionType::Jump;
+		if (bIsCrouching)
+			LocomotionType = ELocomotionType::Crouch;
+		if (bIsRolling)
+			LocomotionType = ELocomotionType::Roll;
+		break;
+	case ELocomotionType::Jog:
+	case ELocomotionType::Sprint:
+		if (bIsIdle)
+			LocomotionType = ELocomotionType::Idle;
+		if (bIsInAir)
+			LocomotionType = ELocomotionType::JumpRun;
+		if (bIsCrouching)
+			LocomotionType = ELocomotionType::Crouch;
+		if (bIsRolling)
+			LocomotionType = ELocomotionType::Roll;
+		break;
+	case ELocomotionType::Jump:
+		//if (0.1f > Super::GetRelevantAnimLength(0, 0))
+		LocomotionType = ELocomotionType::JumpLoop;
+		break;
+	case ELocomotionType::JumpLoop:
+		// 땅에 닿았고, Idle 관련 애님일 때
+		if (!bIsInAir && bIsIdle)
+			LocomotionType = ELocomotionType::JumpEnd;
+		break;
+	case ELocomotionType::JumpEnd:
 		LocomotionType = ELocomotionType::Idle;
-	}
-	else
-	{
-		LocomotionType = (GroundSpeed < SprintSpeed) ? ELocomotionType::Jog : ELocomotionType::Sprint;
+		break;
+	case ELocomotionType::JumpRun:
+		LocomotionType = ELocomotionType::JumpLoopRun;
+		break;
+	case ELocomotionType::JumpLoopRun:
+		// 땅에 닿기 전, 이동 있었는지 체크
+		if (!bIsInAir)
+			LocomotionType = bIsIdle ? ELocomotionType::JumpEnd : ELocomotionType::JumpEndRun;
+		break;
+	case ELocomotionType::JumpEndRun:
+		LocomotionType = ELocomotionType::Idle;
+		break;
+	//case ELocomotionType::JumpFly:
+	//	break;
+	//case ELocomotionType::Crouch:
+	//	break;
+	//case ELocomotionType::Roll:
+	//	break;
+	//case ELocomotionType::Interact:
+	//	break;
+	//case ELocomotionType::Interact02:
+	//	break;
+	//case ELocomotionType::Interact02Start:
+	//	break;
+	//case ELocomotionType::Interact02Loop:
+	//	break;
+	//case ELocomotionType::Interact02End:
+	//	break;
+	//case ELocomotionType::Celebrate:
+	//	break;
+	default:
+		break;
 	}
 }
 
-void UTGAnimInstance::CheckJumpmotion()
-{
-	if (bIsFalling)
-	{
-		JumpmotionType = (Velocity.Z > JumpingThreshould) ? EJumpmotionType::Single : EJumpmotionType::Fall;
-	}
-	else
-	{
-		JumpmotionType = EJumpmotionType::Land;
-	}
-}

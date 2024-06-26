@@ -56,11 +56,12 @@ UPhysicsHandleComponent* UTGGrabberComponent::GetPhysicsHandle() const
 	return PhysicsHandle;
 }
 
-bool UTGGrabberComponent::GetGrabbableInReach(FHitResult& OutHitResult) const
+bool UTGGrabberComponent::IsGrabbableInReach(FHitResult& OutHitResult) const
 {
-	// 3인칭 전방은 캡슐이 이상적인듯
+	// SceneComp는 위치가 있다.. 3인칭 전방은 캡슐이 이상적인듯
 	FVector Start = GetComponentLocation();
 	FVector End = Start + GetForwardVector() * MaxGrabDistance;
+
 	//DrawDebugLine(GetWorld(), Start, End, FColor::Red);
 	//DrawDebugSphere(GetWorld(), End, 10.f, 10.f, FColor::Blue, false , 5.f);
 
@@ -77,7 +78,6 @@ bool UTGGrabberComponent::GetGrabbableInReach(FHitResult& OutHitResult) const
 void UTGGrabberComponent::Grab()
 {
 	// IA Started로 진입해야됨.. Why..?
-
 	UPhysicsHandleComponent* PhysicsHandle = GetPhysicsHandle();
 	if (PhysicsHandle == nullptr)
 	{
@@ -85,13 +85,13 @@ void UTGGrabberComponent::Grab()
 	}
 
 	FHitResult HitResult;
-	bool HasHit = GetGrabbableInReach(HitResult);
+	bool HasHit = IsGrabbableInReach(HitResult);
 	if (HasHit)
 	{	
 		// 충돌 시 공간상의 위치, 투사해서 쓸고 지나가는 반경 있음
 		//DrawDebugSphere(GetWorld(), HitResult.Location, 10.f, 10.f, FColor::Green, false, 5.f);
 		// 충돌 시 실제로 건드리는 지점
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.f, 10.f, FColor::Red, false, 5.f);
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.f, 10.f, FColor::Green, false, 5.f);
 
 		// Handle 깨우기
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();

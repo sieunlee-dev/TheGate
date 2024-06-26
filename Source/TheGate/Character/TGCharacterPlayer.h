@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/TGCharacterBase.h"
 #include "InputActionValue.h"
+#include "Components/TimelineComponent.h"
 #include "TGCharacterPlayer.generated.h"
 
 UENUM(BlueprintType)
@@ -12,6 +13,7 @@ enum class EPlayerStance : uint8
 {
 	Default UMETA(DisplayName = "Default"),
 	Magic UMETA(DisplayName = "Magic"),
+	Melee
 };
 
 template<typename EPlayerStance>
@@ -78,13 +80,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> RollAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	bool bIsInputLocked;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	bool bIsMovmentLocked;
+
 	ECharacterControlType CurrentCharacterControlType;
-
-	UFUNCTION(BlueprintCallable, Category = "Custom Function")
-	void HitActionBegin(FString KeyName);
-
-	UFUNCTION(BlueprintCallable, Category = "Custom Function")
-	void OnHitActionEnd(class UAnimMontage* TargetMontage, bool bInterrupted = true);
 
 protected:
 	void ShoulderMove(const FInputActionValue& Value);
@@ -102,7 +104,20 @@ protected:
 
 #pragma endregion
 
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void HitActionBegin(FString KeyName);
+
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void HitActionEnd(class UAnimMontage* TargetMontage, bool bInterrupted = true);
 	
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void RollActionBegin();
+
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void RollActionEnd(class UAnimMontage* TargetMontage, bool bInterrupted = true);
+
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UTGMoverComponent> MoverComponent;
@@ -112,6 +127,21 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPhysicsHandleComponent> PhysicsHandleComponent;
+
+	// BP에서 생성하고 넣어주자
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Components, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UTimelineComponent> TimelineComponent;
+
+// Roll Timeline
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timeline, Meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* RollCurve;
+
+	// 타임라인 콜백
+	UFUNCTION()
+	void Rolling(const float CurveValue);
+
+	FOnTimelineFloat RollingCallback;
 
 // Stance Section
 protected:
@@ -125,6 +155,9 @@ protected:
 	void SetDefaultStance();
 
 	UFUNCTION(BlueprintCallable, Category = "Custom Function")
+	void SetMeleeStance(AActor* const InWeaponActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Custom Function")
 	void SetCameraOffset(const FVector& OutOffset);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
@@ -134,9 +167,22 @@ protected:
 	float DefaultWalkSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
+	float MeleeWalkSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
 	FVector AimBoomOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stance)
 	FVector DefaultBoomOffset;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Controller, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class APlayerController> PlayerController;
+
+// Spawned Actor
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawned)
+	TSubclassOf<AActor> SpawnActorRef;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawned)
+	TObjectPtr<AActor> SpawnActorObj;
 };

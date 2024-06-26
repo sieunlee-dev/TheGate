@@ -64,7 +64,7 @@ protected:
 	FTimerHandle ComboTimerHandle;
 	bool HasNextComboCommand = false;
 
-// Attack Hit Section
+// Hit Section
 protected:
 	virtual void AttackHitCheck() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -72,11 +72,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> HitMontage;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage, Meta = (AllowPrivateAccess = "true"))
-	//TArray<TObjectPtr<class UAnimMontage>> HitMontages;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage, Meta = (AllowPrivateAccess = "true"))
 	TMap<FString, TObjectPtr<class UAnimMontage>> HitMontages;
+
+// Roll Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> RollMontage;
 
 // Dead Section
 protected:
@@ -88,6 +90,7 @@ protected:
 
 	int32 DeadDirection = 0;
 	float DeadEventDelayTime = 5.0f;
+
 
 // Stat Section
 protected:

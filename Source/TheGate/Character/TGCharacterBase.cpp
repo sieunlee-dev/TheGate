@@ -103,8 +103,8 @@ ATGCharacterBase::ATGCharacterBase()
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &ATGCharacterBase::ReadScroll)));
 
 	// Weapon Component
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
+	//Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	//Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 
 #pragma endregion
 	

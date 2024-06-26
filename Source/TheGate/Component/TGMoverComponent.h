@@ -28,11 +28,13 @@ public:
 	class UCharacterMovementComponent* GetMovementComponent() const;
 	const float& GetMovementSpeed(const bool& OutIsSprint) const { return OutIsSprint ? SprintSpeed : DefaultSpeed ; }
 	const bool& GetIsCanMove() const { return bIsCanMove; }
+	void SetIsCanMove(const bool& InIsCanMove) { bIsCanMove = InIsCanMove; }
 
 public:
 	void ShoulderMove(APawn* const InPawn, const FVector2D& MovementVector);
 	void ShoulderLook(APawn* const InPawn, const FVector2D& LookAxisVector);
 	void QuaterMove(APawn* const InPawn, FVector2D& MovementVector);
+	void Rolling(APawn* const InPawn, const float CurveValue);
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, Meta = (AllowPrivateAccess = "true"))
@@ -43,6 +45,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, Meta = (AllowPrivateAccess = "true"))
 	bool bIsCanMove;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, Meta = (AllowPrivateAccess = "true"))
+	float RollDistance;
 
 private:
 	UPROPERTY(EditAnywhere)

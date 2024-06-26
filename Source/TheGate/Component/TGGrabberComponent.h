@@ -26,7 +26,7 @@ public:
 
 public:
 	class UPhysicsHandleComponent* GetPhysicsHandle() const;
-	bool GetGrabbableInReach(FHitResult& OutHitResult) const;
+	bool IsGrabbableInReach(FHitResult& OutHitResult) const;
 
 	UFUNCTION(BlueprintCallable)
 	void Grab();

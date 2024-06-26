@@ -23,7 +23,8 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 	PlayerStance = EPlayerStance::Default;
 #pragma region Mesh
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"));
+	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/LearningKit_Games/Assets/Characters/Mesh/SK_EpicCharacter.SK_EpicCharacter"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
@@ -124,24 +125,43 @@ ATGCharacterPlayer::ATGCharacterPlayer()
 	PhysicsHandleComponent = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
 	ensure(PhysicsHandleComponent != nullptr);
 
+	// https://zeniff.tistory.com/19
+	TimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
+	ensure(TimelineComponent != nullptr);
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveRef(TEXT("/Game/TheGate/Player/RollCurve.RollCurve"));
+	if (CurveRef.Succeeded())
+		RollCurve = CurveRef.Object;
+
 #pragma endregion
 
 }
 
 void ATGCharacterPlayer::BeginPlay()
 {
-	//TG_LOG(LogTGNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
 	Super::BeginPlay();
 
-	//TG_LOG(LogTGNetwork, Log, TEXT("%s"), TEXT("End"));
+	PlayerController = CastChecked<APlayerController>(GetController());
+	ensure(nullptr != PlayerController);
 
 	SetCharacterControl(CurrentCharacterControlType);
 
 	// 애님 이벤트 바인딩
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->OnMontageEnded.AddDynamic(this, &ATGCharacterPlayer::OnHitActionEnd);
+	// https://forums.unrealengine.com/t/play-montage-in-c-with-onblendout-oninterrupted-etc/447184/2
+	//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	//AnimInstance->OnMontageEnded.AddDynamic(this, &ATGCharacterPlayer::HitActionEnd);
 
+	if (RollCurve && TimelineComponent)
+	{
+		// ONFUNCTION 매크로 필요
+		//RollingCallback.BindUFunction(this, FName("Rolling"));
+		RollingCallback.BindDynamic(this, &ATGCharacterPlayer::Rolling);
+
+		TimelineComponent->AddInterpFloat(RollCurve, RollingCallback, FName("RollCurve"), FName("DistanceMultiplier"));
+		TimelineComponent->SetLooping(false);
+		//TimelineComponent->SetTimelineFinishedFunc()
+	}
+	
 }
 
 void ATGCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
@@ -151,7 +171,7 @@ void ATGCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterC
 
 	SetCharacterControlData(NewCharacterControl);
 
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	//APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		Subsystem->ClearAllMappings();
@@ -180,6 +200,7 @@ void ATGCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Player
 	//EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ATGCharacterPlayer::Attack);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ATGCharacterPlayer::Sprinting);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATGCharacterPlayer::Sprinting);
+	EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Started, this, &ATGCharacterPlayer::RollActionBegin);
 }
 
 void ATGCharacterPlayer::ChangeCharacterControl()
@@ -207,30 +228,56 @@ void ATGCharacterPlayer::SetCharacterControlData(const UTGCharacterControlData* 
 	CameraBoom->bDoCollisionTest = CharacterControlData->bDoCollisionTest;
 }
 
-
 void ATGCharacterPlayer::HitActionBegin(FString KeyName)
 {
 	if (!HitMontages.Contains(KeyName))
 		return;
 
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	// 입력 제한
 	DisableInput(PlayerController);
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(HitMontages[KeyName]);
 
-	// OnCompleted 델리게이트
-	//FOnMontageEnded EndDelegate;
-	//EndDelegate.BindUObject(this, &ATGCharacterPlayer::HitActionEnd);
-	//AnimInstance->Montage_SetEndDelegate(EndDelegate, HitMontage);
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &ATGCharacterPlayer::HitActionEnd);
+	//AnimInstance->OnMontageEnded.AddDynamic(this, &ATGCharacterPlayer::HitActionEnd);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, HitMontages[KeyName]);
 }
 
-void ATGCharacterPlayer::OnHitActionEnd(UAnimMontage* TargetMontage, bool bInterrupted)
+void ATGCharacterPlayer::HitActionEnd(UAnimMontage* TargetMontage, bool bInterrupted)
 {
 	// 성공, 방해 둘다 바인딩?
-
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	EnableInput(PlayerController);
+}
+
+void ATGCharacterPlayer::RollActionBegin(/*const FInputActionValue& Value*/)
+{
+	if (bIsMovmentLocked)
+		return;
+
+	bIsMovmentLocked = true;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(RollMontage);
+
+	// OnCompleted 델리게이트
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &ATGCharacterPlayer::RollActionEnd);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, RollMontage);
+
+	// 타임라인 재생
+	if (RollCurve)
+		TimelineComponent->PlayFromStart();
+	//float TimelineValue = TimelineComponent->CalculateCurrentTimelineValue;
+	//RollingCallback.ExecuteIfBound(TimelineValue);
+}
+
+void ATGCharacterPlayer::RollActionEnd(UAnimMontage* TargetMontage, bool bInterrupted)
+{
+	bIsMovmentLocked = false;
+	UE_LOG(LogTemp, Log, TEXT("RollActionEnd"));
+
 }
 
 void ATGCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
@@ -251,7 +298,7 @@ void ATGCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 	MoverComponent->ShoulderLook(this, LookAxisVector);
 
 	/// Grabber Test
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	PlayerController = CastChecked<APlayerController>(GetController());
 	FHitResult HitResult;
 	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
 
@@ -286,6 +333,14 @@ void ATGCharacterPlayer::Sprinting(const FInputActionValue& Value)
 	GetCharacterMovement()->MaxWalkSpeed = MoverComponent->GetMovementSpeed(Value.IsNonZero());
 }
 
+void ATGCharacterPlayer::Rolling(const float CurveValue)
+{
+	if (!MoverComponent->GetIsCanMove())
+		return;
+
+	MoverComponent->Rolling(this, CurveValue);
+}
+
 void ATGCharacterPlayer::Attack()
 {
 	// Pressed Key
@@ -309,6 +364,49 @@ void ATGCharacterPlayer::SetDefaultStance()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
+}
+
+void ATGCharacterPlayer::SetMeleeStance(AActor* const InWeaponActor)
+{
+	PlayerStance = EPlayerStance::Melee;
+
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	GetCharacterMovement()->MaxWalkSpeed = MeleeWalkSpeed;
+
+	/*
+	// Spawn Actor
+	if (nullptr != SpawnActorRef) {
+		FVector Location = GetActorLocation() + FVector(200, 0, 0);
+		FRotator Rotation = FRotator::ZeroRotator;
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+
+		// 액터 스폰
+		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(SpawnActorRef, Location, Rotation, SpawnParams);
+		if (SpawnedActor)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Spawned actor: %s"), *SpawnedActor->GetName());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to spawn actor."));
+		}
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Failed to spawn actor."));
+	}*/
+	
+	if (nullptr != InWeaponActor) {
+		SpawnActorObj = InWeaponActor;
+		SpawnActorObj->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("Hand_RSocket"));
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Failed to spawn actor."));
+	}
+
 }
 
 void ATGCharacterPlayer::SetCameraOffset(const FVector& OutOffset)

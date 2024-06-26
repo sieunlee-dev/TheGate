@@ -6,28 +6,39 @@
 #include "Animation/AnimInstance.h"
 #include "TGAnimInstance.generated.h"
 
+#define NAME(x) UMETA(DisplayName = #x)
+//#define TIME_REMAINING(idx, ratio) \
+//if (ratio > GetInstanceAssetPlayerTimeFromEndFraction(idx))
 
-UENUM()
-enum class ELocomotionType : uint8
+UENUM(BlueprintType)
+enum class ELocomotionType : uint8 // 0x00~0xff
 {
-	Idle,
-	Jog,
-	Sprint,
-	Jump,
-	Fall,
-	Roll,
-	None
+	Idle			= 0xff,
+	Jog				= Idle ^ 1 << 0,
+	Sprint			= Idle ^ 1 << 1,
+
+	Jump			= Idle >> 1,
+	JumpLoop		= Jump ^ 1 << 0,
+	JumpEnd			= Jump ^ 1 << 1, // Fall
+	JumpRun			= Jump ^ 1 << 2,
+	JumpLoopRun		= JumpRun ^ 1 << 0,
+	JumpEndRun		= JumpRun ^ 1 << 1, // Fall
+	JumpFly			= Jump ^ 1 << 3,
+
+	Crouch			= Idle >> 2,
+
+	Roll			= Idle >> 3,
+
+	Interact		= Idle >> 4,
+	Interact02		= Interact ^ 1 << 0,
+	Interact02Start	= Interact02 ^ 1 << 1,
+	Interact02Loop	= Interact02 ^ 1 << 2,
+	Interact02End	= Interact02 ^ 1 << 3,
+
+	Celebrate		= Idle >> 7,
+	End = 0,
 };
 
-UENUM()
-enum class EJumpmotionType : uint8
-{
-	Land,
-	Fall,
-	Single,
-	Double,
-	None
-};
 
 UCLASS()
 class THEGATE_API UTGAnimInstance : public UAnimInstance
@@ -54,40 +65,37 @@ protected:
 	float GroundSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float SprintSpeed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	uint8 bIsIdle : 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float MovingThreshould;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	float JumpingThreshould;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	ELocomotionType LocomotionType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	ELocomotionType PreLocomotionType;
+	uint8 bIsIdle : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	EJumpmotionType JumpmotionType;
+	uint8 bIsInAir : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	uint8 bIsFalling : 1;
+	uint8 bIsFlying : 1;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	//uint8 bIsJumping : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsCrouching : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	uint8 bIsRolling : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float JumpingThreshould;	
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Character)
 	float Direction;
 
+private:
+	UPROPERTY()
+	float SprintSpeed;
 
 protected:
 	virtual void CheckLocomotion();
-	virtual void CheckJumpmotion();
+	//const float GetAnimTimeRemainingRatio(const int32& MachineIndex, const int32& StateIndex);
 };

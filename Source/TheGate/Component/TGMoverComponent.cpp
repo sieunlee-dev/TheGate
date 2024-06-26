@@ -93,4 +93,15 @@ void UTGMoverComponent::QuaterMove(APawn* const InPawn, FVector2D& MovementVecto
 	InPawn->AddMovementInput(MoveDirection, MovementVectorSize);
 }
 
+void UTGMoverComponent::Rolling(APawn* const InPawn, const float CurveValue)
+{
+	// Size2D()
+	FVector RollVector = InPawn->GetActorForwardVector() * CurveValue * RollDistance;
+
+	UCharacterMovementComponent* Movement = GetMovementComponent();
+	RollVector.Z = Movement->Velocity.Z;
+
+	Movement->Velocity = RollVector;
+}
+
 
