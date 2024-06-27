@@ -179,10 +179,7 @@ protected:
 	TObjectPtr<class APlayerController> PlayerController;
 
 // Spawned Actor
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawned)
-	TSubclassOf<AActor> SpawnActorRef;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawned)
-	TObjectPtr<AActor> SpawnActorObj;
+//protected:
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawned)
+//	TObjectPtr<AActor> EquippedWeapon;
 };

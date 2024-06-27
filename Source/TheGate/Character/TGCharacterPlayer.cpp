@@ -330,6 +330,9 @@ void ATGCharacterPlayer::Sprinting(const FInputActionValue& Value)
 	//GetCharacterMovement()->MaxWalkSpeed = (bIsSprinting ? Stat->GetTotalStat().SprintSpeed : Stat->GetTotalStat().JogSpeed);
 	//UE_LOG(LogTemp, Log, TEXT("Sprint : %f / Default : %f"), SprintSpeed, DefaultSpeed);
 
+	if (PlayerStance != EPlayerStance::Default)
+		return;
+
 	GetCharacterMovement()->MaxWalkSpeed = MoverComponent->GetMovementSpeed(Value.IsNonZero());
 }
 
@@ -363,7 +366,7 @@ void ATGCharacterPlayer::SetDefaultStance()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
+	//GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 }
 
 void ATGCharacterPlayer::SetMeleeStance(AActor* const InWeaponActor)
@@ -399,13 +402,13 @@ void ATGCharacterPlayer::SetMeleeStance(AActor* const InWeaponActor)
 		UE_LOG(LogTemp, Warning, TEXT("Failed to spawn actor."));
 	}*/
 	
-	if (nullptr != InWeaponActor) {
-		SpawnActorObj = InWeaponActor;
-		SpawnActorObj->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("Hand_RSocket"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Failed to spawn actor."));
-	}
+	//if (nullptr != InWeaponActor) {
+	//	EquippedWeapon = InWeaponActor;
+	//	EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("Hand_RSocket"));
+	//}
+	//else {
+	//	UE_LOG(LogTemp, Warning, TEXT("Failed to spawn actor."));
+	//}
 
 }
 
