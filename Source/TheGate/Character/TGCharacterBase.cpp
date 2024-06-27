@@ -49,23 +49,23 @@ ATGCharacterBase::ATGCharacterBase()
 
 #pragma region Montage Assets
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/TheGate/Animation/AM_ComboAttack.AM_ComboAttack"));
-	if (ComboActionMontageRef.Object)
-	{
-		ComboActionMontage = ComboActionMontageRef.Object;
-	}
+	//static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/TheGate/Animation/AM_ComboAttack.AM_ComboAttack"));
+	//if (ComboActionMontageRef.Object)
+	//{
+	//	ComboActionMontage = ComboActionMontageRef.Object;
+	//}
 
-	static ConstructorHelpers::FObjectFinder<UTGComboActionData> ComboActionDataRef(TEXT("/Game/TheGate/DataAsset/Action/TGA_ComboAttack.TGA_ComboAttack"));
-	if (ComboActionDataRef.Object)
-	{
-		ComboActionData = ComboActionDataRef.Object;
-	}
+	//static ConstructorHelpers::FObjectFinder<UTGComboActionData> ComboActionDataRef(TEXT("/Game/TheGate/DataAsset/Action/TGA_ComboAttack.TGA_ComboAttack"));
+	//if (ComboActionDataRef.Object)
+	//{
+	//	ComboActionData = ComboActionDataRef.Object;
+	//}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Game/TheGate/Animation/AM_Dead.AM_Dead"));
-	if (DeadMontageRef.Object)
-	{
-		DeadMontage = DeadMontageRef.Object;
-	}
+	//static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Game/TheGate/Animation/AM_Dead.AM_Dead"));
+	//if (DeadMontageRef.Object)
+	//{
+	//	DeadMontage = DeadMontageRef.Object;
+	//}
 
 	//static ConstructorHelpers::FObjectFinder<UAnimMontage> StopMontageRef(TEXT("/Game/TheGate/Animation/AM_JogToStand.AM_JogToStand"));
 	//if (StopMontageRef.Object)
